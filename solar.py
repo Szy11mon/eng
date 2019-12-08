@@ -1,12 +1,19 @@
 from visual import *
 from variables import *
 
+
 class Solar:
     def __init__(self, window):
         self.win = window
-        self.percent = self.win.Ctrls[0].GetValue()
+
+    @staticmethod
+    def description():
+        text(text="This simulation shows our solar system\nYou can pick with how much of its actual speed\n"
+                  "the Earth will move\nThe number of days that passed is displayed",
+             align='center', depth=-0.2, color=color.green)
 
     def prepare(self):
+        self.percent = self.win.Ctrls[0].GetValue()
         self.sun = sphere(pos=(0, 0, 0), radius=10 ** 10, color=color.yellow)
         self.T = [curve(color=color.magenta), curve(color=color.green), curve(color=color.blue), curve(color=color.red)]
         self.planet1 = sphere(pos=(70 * (10 ** 9), 0, 0), radius=3 * 10 ** 9, color=color.magenta)

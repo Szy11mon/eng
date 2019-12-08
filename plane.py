@@ -4,14 +4,21 @@ from variables import *
 class Plane:
     dist = 0
     def __init__(self,window):
-        self.win = window
+        self.win =window
+
+    def description(self):
+        text(text="This is simple inclined plane\nAngle defines how steep the plane is"
+                  "\nYou can also define mass of the block and plane length\nFriction is a coefficient between 0 and 1"
+                  "\nthat says how much the floor reacts on block\nAir resistance is also a coefficient"
+                  "\nwhich defines how much the air influences acceleration ",
+             align='center', depth=-0.2, color=color.green)
+
+    def prepare(self):
         self.angle = self.win.Ctrls[0].GetValue()
         self.mass = self.win.Ctrls[1].GetValue()
         self.length = self.win.Ctrls[2].GetValue()
         self.friction = self.win.Ctrls[3].GetValue()
         self.air_res = self.win.Ctrls[4].GetValue()
-
-    def prepare(self):
         self.win.scene.autoscale = False
         self.win.scene.range = self.length
         self.theta = degree_to_rad * self.angle

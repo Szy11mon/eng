@@ -127,12 +127,15 @@ class MainWindow(window):
 
     def SetVariablesPanel(self):
         for i in range(5):
-            self.var_start.append(wx.StaticText(self.panel, label='xD', pos=(0.08*self.screen_size[0], 0.04*(i+1)*self.screen_size[1])))
+            self.var_start.append(wx.StaticText(self.panel, label='', pos=(0.08*self.screen_size[0], 0.04*(i+1)*self.screen_size[1])))
             self.var_start[i].Hide()
             self.Ctrls.append(wx.SpinCtrlDouble(self.panel, value='0', pos=(0.14*self.screen_size[0], 0.04*(i+1)*self.screen_size[1]), size=(60, -1)))
             self.Ctrls[i].Hide()
             self.var_exec.append(wx.StaticText(self.panel, label='', pos=((0.9-i*0.1)*self.screen_size[0], 0.86*self.screen_size[1])))
             self.var_exec[i].Hide()
+        self.xd = wx.StaticText(self.panel, label='', pos=(0.5*self.screen_size[0], 0.5*self.screen_size[1]))
+        font = wx.Font(18, wx.DECORATIVE, wx.ITALIC, wx.NORMAL)
+        self.xd.SetFont(font)
 
     def OnExit(self, event):
         if self.debug_mode:
@@ -239,7 +242,6 @@ class MainWindow(window):
         self.SetLabels(self.var_exec, 'Ep + Ek', 'Ep', 'Ek')
         self.SetRanges((0, 1), (2, 30), (0, 30))
         self.simulation.changeMode('Helixes')
-        self.simulation.description()
 
     def OnSolar(self,event):
         self.simulation = Simulation(self)
@@ -260,14 +262,14 @@ class MainWindow(window):
     def OnMomentum(self,event):
         self.simulation = Simulation(self)
         self.SetLabels(self.var_start, 'V(m/s)', 'Mass1(kg)', 'Mass2(kg)', 'Number')
-        #self.SetLabels(self.var_exec, 'hits')
+        self.SetLabels(self.var_exec, 'V(m/s)')
         self.SetRanges((1, 5), (1, 1000), (1, 1000), (1, 5))
         self.simulation.changeMode('Momentum')
 
     def OnMomentum2(self,event):
         self.simulation = Simulation(self)
         self.SetLabels(self.var_start, 'Mass1(kg)', 'Mass2(kg)', 'Mass3(kg)', 'Height(m)', 'Distance(m)')
-        # self.SetLabels(self.var_exec, 'hits')
+        self.SetLabels(self.var_exec, 'V1(m/s)', 'V2(m/s)', 'V3(m/s)', 'height(m)')
         self.SetRanges((1, 10**7), (1, 10**7), (1, 10**7), (1, 50), (1, 50))
         self.simulation.changeMode('Momentum2')
 
@@ -300,4 +302,4 @@ class MainWindow(window):
 
 
 if __name__ == '__main__':
-    w = MainWindow("Planet Simulator")
+    w = MainWindow("Dynamics")

@@ -4,13 +4,19 @@ from variables import *
 class Conical:
     def __init__(self,window):
         self.win = window
+
+    @staticmethod
+    def description():
+        text(text="This is conical pendulum\nYou can define angle,length and mass\nYou can "
+                  "see that the mass doesn't affect the period",
+             align='center', depth=-0.2, color=color.green)
+
+    def prepare(self):
         self.angle = self.win.Ctrls[0].GetValue()
         self.mass = self.win.Ctrls[1].GetValue()
         self.length = self.win.Ctrls[2].GetValue()
         self.theta = degree_to_rad * self.angle
         self.r = self.length * cos(self.theta)
-
-    def prepare(self):
         self.win.scene.center=(0,self.r/3,0)
         self.Ring = ring(pos=(0,0,0),axis=(0,1,0),radius=self.r,thickness=self.r/100,color=color.blue)
         self.Thread = curve(pos=[(self.r,0,0),(0,self.r-self.r/10,0)])

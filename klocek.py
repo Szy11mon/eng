@@ -6,14 +6,19 @@ class Block:
 
     def __init__(self,window):
         self.win = window
-        self.V0 = self.win.Ctrls[0].GetValue()
-        self.mass = self.win.Ctrls[1].GetValue()
+
+    def description(self):
+        text(text="There are two blocks\nFirst one has mass of 1kg\nYou can choose the mass of the second one"
+                  "\nSecond block moves with defined velocity and hits first block\nThe number of hits below is"
+                  "\nthe number of times the blocks hit each other or the wall",
+             align='center', depth=-0.2, color=color.green)
 
     def prepare(self):
-        scale = log10(self.mass/1)+1
-        print scale
         self.win.scene.autoscale = False
         self.win.scene.range = 21
+        self.V0 = self.win.Ctrls[0].GetValue()
+        self.mass = self.win.Ctrls[1].GetValue()
+        scale = log10(self.mass / 1) + 1
         self.block1 = box(pos=(0, 1*scale, 0), size=(2*scale, 2*scale, 0.06), color=color.blue)
         self.block2 = box(pos=(-10,1,0),size=(2,2,0.06),color=color.green)
         self.road = box(pos=(0,0,0),size=(40,0.05,0.05),color=color.red)

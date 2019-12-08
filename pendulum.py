@@ -4,11 +4,18 @@ from variables import *
 class Pendulum:
     def __init__(self,window):
         self.win = window
+
+    @staticmethod
+    def description():
+        text(text="This is a simulation of simple pendulum\nFirts of them works according to physics\n"
+                  "\nthe second one uses sin(a)=a\nYou can choose length of the thread\nand starting inclination"
+                  "\nThe simulation displays both angles during its run",
+             align='center', depth=-0.2, color=color.green)
+
+    def prepare(self):
         self.angle = self.win.Ctrls[0].GetValue()
         self.length = self.win.Ctrls[1].GetValue()
         self.g = self.win.Ctrls[2].GetValue()
-
-    def prepare(self):
         self.line1=curve(pos=[(-5,0,0),(-1,0,0),(-3,0,0),(-3,-6,0)])
         self.theta = toRadian(self.angle)
         self.win.scene.autoscale = False

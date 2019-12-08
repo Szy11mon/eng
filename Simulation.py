@@ -17,21 +17,18 @@ class Simulation(object):
 
     def changeMode(self,mode):
         self.mode = mode
-
-    def description(self):
         str = self.mode + '(self.win)'
         self.sim = eval(str)
         self.win.scene.delete()
         self.win.SetDisplay()
+        self.win.simulation_stopped = True
+        self.win.scene.center = (0, 0, 0)
         self.sim.description()
 
     def run(self):
         self.win.scene.delete()
         self.win.SetDisplay()
         self.win.scene.background = color.black
-        self.win.scene.center = (0, 0, 0)
-        str = self.mode + '(self.win)'
-        self.sim = eval(str)
         self.sim.prepare()
         self.win.simulation_started = True
         self.sim.run()
