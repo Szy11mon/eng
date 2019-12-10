@@ -9,10 +9,9 @@ class Momentum2:
 
     @staticmethod
     def description():
-        text(text="There is one ball and up to 5 balls on its path\nYou can define velocity of the first ball\n"
-                  "as well as its mass and mass of the remaining balls\nVelocity of all balls is displayed\n"
-                  "as well as height of the third ball",
-             align='center', depth=-0.2, color=color.green)
+        return "There is one ball and up to 5 balls on its path\nYou can define velocity of the first ball\n"\
+               "as well as its mass and mass of the remaining balls\nVelocity of all balls is displayed\n"\
+               "as well as height of the third ball"
 
     def prepare(self):
         self.mass1 = self.win.Ctrls[0].GetValue()

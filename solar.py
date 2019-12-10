@@ -8,9 +8,8 @@ class Solar:
 
     @staticmethod
     def description():
-        text(text="This simulation shows our solar system\nYou can pick with how much of its actual speed\n"
-                  "the Earth will move\nThe number of days that passed is displayed",
-             align='center', depth=-0.2, color=color.green)
+        return "This simulation shows our solar system\nYou can pick with how much of its actual speed\n"\
+               "the Earth will move\nThe number of days that passed is displayed"
 
     def prepare(self):
         self.percent = self.win.Ctrls[0].GetValue()

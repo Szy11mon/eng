@@ -7,10 +7,9 @@ class Pendulum:
 
     @staticmethod
     def description():
-        text(text="This is a simulation of simple pendulum\nFirts of them works according to physics\n"
-                  "\nthe second one uses sin(a)=a\nYou can choose length of the thread\nand starting inclination"
-                  "\nThe simulation displays both angles during its run",
-             align='center', depth=-0.2, color=color.green)
+        return "This is a simulation of simple pendulum\nFirts of them works according to physics\n"\
+               "the second one uses sin(a)=a\nYou can choose length of the thread\nand starting inclination"\
+               "\nThe simulation displays both angles during its run"
 
     def prepare(self):
         self.angle = self.win.Ctrls[0].GetValue()
@@ -40,15 +39,11 @@ class Pendulum:
             if self.win.simulation_stopped == False:
                 rate(1000)
                 a1=(-self.g/self.length)*sin(fi1)
-                print sin(fi1)
-                print fi1
                 V1=V1+a1*dt
                 fi1=fi1+V1*dt
                 self.ba1.pos=(self.length*np.sin(fi1)-3,-self.length*np.cos(fi1),0)
                 self.line3.pos=((-3,0,0),self.ba1.pos)
                 a2 = (-self.g / self.length) * fi2
-                print sin(fi2)
-                print fi2
                 V2 = V2 + a2 * dt
                 fi2 = fi2 + V2 * dt
                 self.ba2.pos = (self.length * np.sin(fi2)+3, -self.length * np.cos(fi2), 0)

@@ -1,5 +1,7 @@
 from visual import *
 from variables import *
+from physics import *
+
 
 class Momentum:
 
@@ -8,9 +10,8 @@ class Momentum:
 
     @staticmethod
     def description():
-        text(text="There is one ball and up to 5 balls on its path\nYou can define velocity of the first ball\n"
-                  "as well as its mass and mass of the remaining balls\nYou can see velocity of the second ball",
-             align='center', depth=-0.2, color=color.green)
+        return "There is one ball and up to 5 balls on its path\nYou can define velocity of the first ball\n"\
+               "as well as its mass and mass of the remaining balls\nYou can see velocity of the first and second ball"
 
     def prepare(self):
         self.V0 = self.win.Ctrls[0].GetValue()
@@ -47,18 +48,14 @@ class Momentum:
                 rate(1000)
                 for i in range(self.number):
                     if self.balls[i].pos.x > self.balls[i+1].pos.x - self.balls[i].radius -self.balls[i+1].radius:
-                        m1=self.balls[i].m
-                        m2=self.balls[i+1].m
-                        tmp = self.balls[i].v
-                        print tmp
-                        self.balls[i].v = ((m1 - m2)/(m1+m2))*self.balls[i].v + (2*m2/(m1+m2))*self.balls[i+1].v
-                        self.balls[i+1].v = (2*m1/(m1+m2))*tmp + ((m2-m1)/(m1+m2))*self.balls[i+1].v
+                        momentum_conservation_principle(self.balls[i], self.balls[i+1])
                 for i in range(self.number+1):
                     self.balls[i].pos = self.balls[i].pos + self.balls[i].v * dt
-                t = t + dt
-                counter = counter +1
                 if counter % 50 == 0:
-                    self.win.var_exec[0].SetLabel('V(m/s): ' + '%.2f' % self.balls[1].v.x)
+                    self.win.var_exec[0].SetLabel('V2(m/s): ' + '%.2f' % self.balls[1].v.x)
+                    self.win.var_exec[1].SetLabel('V1(m/s): ' + '%.2f' % self.balls[0].v.x)
+                t = t + dt
+                counter = counter + 1
             else:
                 while True:
                     rate(10)

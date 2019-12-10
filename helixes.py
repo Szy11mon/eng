@@ -6,14 +6,13 @@ class Helixes:
         self.win = window
 
     def description(self):
-        text(text="There are two balls that don't move\nBalls are connected with helixes\nk is the elasticity factor"
-                  "\nNumber means number of balls that move\nYou can also define mass of the balls\nDuring the simulation you will see"
-                  "\nthe kinetic energy,potential energy and sum of the energy of all the balls ",
-             align='center', depth=-0.2, color=color.green)
+        return "There are two balls that don't move\nBalls are connected with helixes\nk is the elasticity factor"\
+               "\nNumber means number of balls that move\nYou can also define mass of the balls\nDuring the simulation you will see"\
+               "\nthe kinetic energy,potential energy and sum of the energy of all the balls "
 
     def prepare(self):
         self.k = self.win.Ctrls[0].GetValue()
-        self.quantity = int(self.win.Ctrls[1].GetValue())
+        self.quantity = int(self.win.Ctrls[1].GetValue()+1)
         self.mass = self.win.Ctrls[2].GetValue()
         self.ba1 = sphere(pos=(-50,0,0),radius=1,color=color.red)
         self.ba=[self.ba1]

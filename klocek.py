@@ -8,10 +8,9 @@ class Block:
         self.win = window
 
     def description(self):
-        text(text="There are two blocks\nFirst one has mass of 1kg\nYou can choose the mass of the second one"
-                  "\nSecond block moves with defined velocity and hits first block\nThe number of hits below is"
-                  "\nthe number of times the blocks hit each other or the wall",
-             align='center', depth=-0.2, color=color.green)
+        return "There are two blocks\nFirst one has mass of 1kg\nYou can choose the mass of the second one"\
+               "\nSecond block moves with defined velocity and hits first block\nThe number of hits below is"\
+               "\nthe number of times the blocks hit each other or the wall"
 
     def prepare(self):
         self.win.scene.autoscale = False
@@ -36,13 +35,13 @@ class Block:
             if self.win.simulation_stopped == False:
                 rate(1000)
                 if self.block1.pos.x < self.block2.pos.x + 1+(self.block1.size.x/2):
-                    counter+=1
+                    counter += 1
                     tmp = self.block1.v
                     self.block1.v = ((self.mass - 1)/(self.mass+1))*self.block1.v + (2/(self.mass+1))*self.block2.v
                     self.block2.v = (2*self.mass/(1+self.mass))*tmp + ((1-self.mass)/(1+self.mass))*self.block2.v
                     self.win.var_exec[0].SetLabel('hits: ' + '%d' % counter)
                 if self.block2.pos.x < -19:
-                    counter +=1
+                    counter += 1
                     self.win.var_exec[0].SetLabel('hits: ' + '%d' % counter)
                     self.block2.v = -self.block2.v
                 self.block1.pos=self.block1.pos + self.block1.v * dt

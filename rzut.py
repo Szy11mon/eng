@@ -10,10 +10,9 @@ class Throw:
 
     @staticmethod
     def description():
-        text(text="This is diagonal throw but with the influence of the air\nYou can set angle, starting velocity\n"
-                  "and the coefficient of air resistance\nDuring the simulation you will see velocities in both directions\n"
-                  "height and distance",
-             align='center', depth=-0.2, color=color.green)
+        return "This is diagonal throw but with the influence of the air\nYou can set angle, starting velocity\n"\
+               "and the coefficient of air resistance\nDuring the simulation you will see velocities in both directions\n"\
+               "height and distance"
 
     def prepare(self):
         self.angle = self.win.Ctrls[0].GetValue()
@@ -25,7 +24,7 @@ class Throw:
         self.dist = (self.velocity * self.velocity * sin(2 * self.theta)) / g
         self.cannon = box(pos=(-(self.dist / 2), self.dist * 0.02, 0),
                           size=(self.dist * 0.04, self.dist * 0.04, self.dist * 0.04), color=color.red)
-        self.Road = box(pos=vector(0, 0, 0), size=vector(self.dist * 1.4, self.dist / 100, 0.3), color=color.green,
+        self.Road = box(pos=vector(0, 0, 0), size=vector(self.dist * 1.4, self.dist / 100, 50), color=color.green,
                         opacity=0.3)
         self.cannon.rotate(angle=self.theta, origin=vector(-(self.dist / 2), self.dist * 0.02, 0), axis=vector(0, 0, 1))
         if self.angle < 70:

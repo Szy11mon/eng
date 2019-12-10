@@ -20,6 +20,8 @@ class MainWindow(window):
     simulation = None
     simulation_speed = 0
     simulation_timestep = 0
+    same_sim = False
+    mode = ''
     frequency = 0
 
     # Flags
@@ -48,13 +50,8 @@ class MainWindow(window):
         self.fullscreen = True
         self.SetVariablesPanel()
         self.SetMenubar()
-        self.SetDisplay()
-        self.SetStart()
-        if self.debug_mode:
-            print("...done(main window)!")
+
     def SetMenubar(self):
-        if self.debug_mode:
-            print("Setting menubar...")
         filemenu = wx.Menu()
 
         menuItem = filemenu.Append(wx.ID_EXIT, "&Exit",
@@ -113,19 +110,17 @@ class MainWindow(window):
 
         resumeButton.Bind(wx.EVT_BUTTON, self.OnResume)
 
-
-
-        # Creating the menubar.
         menuBar = wx.MenuBar()
-        # Adding menus
+
         menuBar.Append(filemenu, "&File")
 
-        self.win.SetMenuBar(menuBar)  # Adding menuBar to frame
+        self.win.SetMenuBar(menuBar)
         if self.debug_mode:
             print("...done!")
 
 
     def SetVariablesPanel(self):
+        self.simulation = Simulation(self)
         for i in range(5):
             self.var_start.append(wx.StaticText(self.panel, label='', pos=(0.08*self.screen_size[0], 0.04*(i+1)*self.screen_size[1])))
             self.var_start[i].Hide()
@@ -133,56 +128,35 @@ class MainWindow(window):
             self.Ctrls[i].Hide()
             self.var_exec.append(wx.StaticText(self.panel, label='', pos=((0.9-i*0.1)*self.screen_size[0], 0.86*self.screen_size[1])))
             self.var_exec[i].Hide()
-        self.xd = wx.StaticText(self.panel, label='', pos=(0.5*self.screen_size[0], 0.5*self.screen_size[1]))
+        self.description = wx.StaticText(self.panel, label='Pick one simulation from the list', pos=(0.4*self.screen_size[0], 0.1*self.screen_size[1]))
         font = wx.Font(18, wx.DECORATIVE, wx.ITALIC, wx.NORMAL)
-        self.xd.SetFont(font)
+        self.description.SetFont(font)
 
     def OnExit(self, event):
-        if self.debug_mode:
-            print("User pressed Exit")
-        # Save before exit dialog
-        if self.state_saved == False:
-            dlg = wx.MessageDialog(self.win,
-                                   "Do you want to save it?",
-                                   "State not saved",
-                                   wx.YES | wx.NO | wx.ICON_QUESTION)
-            result = dlg.ShowModal()
-            dlg.Destroy()
-            if result == wx.ID_YES:
-                print("I WENT HERE")
-                self.OnSaveAs(wx.EVT_MENU)
-
-        #else:
-            dlg = wx.MessageDialog(self.win,
-                                   "Do you really want to close this application?",
-                                   "Confirm Exit",
-                                   wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-            result = dlg.ShowModal()
-            dlg.Destroy()
-            if result == wx.ID_OK:
-                exit()
+        dlg = wx.MessageDialog(self.win,
+                               "Do you really want to close this application?",
+                               "Confirm Exit",
+                               wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        result = dlg.ShowModal()
+        dlg.Destroy()
+        if result == wx.ID_OK:
+            exit()
 
     def OnRun(self, event):
         self.simulation_stopped = False
-        if self.simulation.mode == 'Plane' and tan(self.Ctrls[0].GetValue()*0.01745329252) < self.Ctrls[3].GetValue():
-            dlg5 = wx.MessageDialog(self.win,
-                                    "Friction is too big",
-                                    "Error",
-                                    wx.OK)
-            dlg5.ShowModal()
-            dlg5.Destroy()
-        else:
-            self.simulation.run()
-
+        if self.mode == self.simulation.mode:
+            self.same_sim = True
+        self.mode = self.simulation.mode
+        self.simulation.run()
 
     def OnPause(self, event):
-        if self.simulation == None or self.simulation_stopped == True:
+        if self.simulation is None or self.simulation_stopped == True:
             pass
         else:
             self.simulation_stopped = True
 
     def OnResume(self,event):
-        if self.simulation == None or self.simulation_stopped == False:
+        if self.simulation is None or self.simulation_stopped == False:
             pass
         else:
             self.simulation_stopped = False
@@ -190,97 +164,85 @@ class MainWindow(window):
 
 
     def SetDisplay(self):
-        if self.debug_mode:
-            print("Setting display...")
-        # Display
-        self.scene = display(window=self,x=0.2*self.screen_size[0],y=0, width=0.8*self.screen_size[0],
-                             height =0.85*self.screen_size[1],autoscale=True,centre=vector(0,0,0))
+        self.scene = display(window=self, x=0.2*self.screen_size[0], y=0, width=0.8*self.screen_size[0],
+                             height=0.85*self.screen_size[1], autoscale=True, centre=vector(0,0,0))
 
-    def SetStart(self):
-        text(text='Dynamics Simulations!',
-             align='center', depth=-0.3, color=color.green)
-
-    def Center(self, event):
-        self.UpdateStatusbar(event.label)
-        self.scene.center = self.following.visual.pos
 
     def OnPlane(self,event):
-        self.simulation = Simulation(self)
-        symbol = 'Angle(' + u"\u00b0" +')'
-        self.SetLabels(self.var_start,symbol,'Mass(kg)','Length(m)','Friction','Air Resistance')
+        symbol = 'Angle(' + u"\u00b0" + ')'
+        self.SetLabels(self.var_start, symbol ,'Mass(kg)', 'Length(m)', 'Friction', 'Air Resistance')
         self.SetLabels(self.var_exec, 'time(s)', 'V(m/s)', 'a(m/s^2)', '')
-        self.SetRanges((10,80),(1,100),(1,100),(0,1),(0,1))
+        self.SetRanges((10, 80), (1, 100), (1, 100), (0, 1), (0, 1))
+        self.SetDefaultValues(45, 10, 10, 0, 0)
         self.simulation.changeMode('Plane')
 
     def OnPendulum(self,event):
-        self.simulation = Simulation(self)
         symbol = 'Angle(' + u"\u00b0" + ')'
-        self.SetLabels(self.var_start, symbol,'Length(m)', 'g(m/s^2)')
+        self.SetLabels(self.var_start, symbol, 'Length(m)', 'g(m/s^2)')
         self.SetLabels(self.var_exec, 'angle2', 'angle1', '', '')
         self.SetRanges((10, 350), (1, 6), (0, 20))
-        self.Ctrls[2].SetValue(g)
+        self.SetDefaultValues(45, 4, g)
         self.simulation.changeMode('Pendulum')
 
     def OnThrow(self,event):
-        self.simulation = Simulation(self)
         symbol = 'Angle(' + u"\u00b0" +')'
         self.SetLabels(self.var_start, symbol, 'Velocity(m/s)', 'Air Resistance')
         self.SetLabels(self.var_exec, 'x(m)', 'h(m)', 'Vy(m/s)', 'Vx(m/s)')
         self.SetRanges((10, 80), (10, 300), (0, 5))
+        self.SetDefaultValues(45, 50, 0)
         self.simulation.changeMode('Throw')
 
     def OnBlock(self,event):
-        self.simulation = Simulation(self)
         self.SetLabels(self.var_start, 'V(m/s)', 'Mass(kg)',)
         self.SetLabels(self.var_exec, 'hits')
         self.SetRanges((1, 5), (1, 10**12))
+        self.SetDefaultValues(1,100)
         self.simulation.changeMode('Block')
 
     def OnHelix(self,event):
-        self.simulation = Simulation(self)
         self.SetLabels(self.var_start, 'k', 'Number', 'Mass(kg)')
         self.SetLabels(self.var_exec, 'Ep + Ek', 'Ep', 'Ek')
-        self.SetRanges((0, 1), (2, 30), (0, 30))
+        self.SetRanges((0, 1), (1, 30), (0, 30))
+        self.SetDefaultValues(1, 1, 10)
         self.simulation.changeMode('Helixes')
 
     def OnSolar(self,event):
-        self.simulation = Simulation(self)
         self.SetLabels(self.var_start, "% of Earth's V")
         self.SetLabels(self.var_exec, 'Days')
         self.SetRanges((0, 200))
-        self.Ctrls[0].SetValue(100)
+        self.SetDefaultValues(100)
         self.simulation.changeMode('Solar')
 
     def OnConical(self,event):
-        self.simulation = Simulation(self)
         symbol = 'Angle(' + u"\u00b0" + ')'
         self.SetLabels(self.var_start, symbol, 'Mass(kg)', 'Length')
-        #self.SetLabels(self.var_exec, 'hits')
+        self.SetLabels(self.var_exec, 'x(m)', 'z(m)')
         self.SetRanges((1, 89), (1, 100), (0, 20))
+        self.SetDefaultValues(45, 1, 5)
         self.simulation.changeMode('Conical')
 
     def OnMomentum(self,event):
-        self.simulation = Simulation(self)
         self.SetLabels(self.var_start, 'V(m/s)', 'Mass1(kg)', 'Mass2(kg)', 'Number')
-        self.SetLabels(self.var_exec, 'V(m/s)')
+        self.SetLabels(self.var_exec, 'V1(m/s)', 'V2(m/s)')
         self.SetRanges((1, 5), (1, 1000), (1, 1000), (1, 5))
+        self.SetDefaultValues(2, 10, 1)
         self.simulation.changeMode('Momentum')
 
     def OnMomentum2(self,event):
-        self.simulation = Simulation(self)
         self.SetLabels(self.var_start, 'Mass1(kg)', 'Mass2(kg)', 'Mass3(kg)', 'Height(m)', 'Distance(m)')
         self.SetLabels(self.var_exec, 'V1(m/s)', 'V2(m/s)', 'V3(m/s)', 'height(m)')
         self.SetRanges((1, 10**7), (1, 10**7), (1, 10**7), (1, 50), (1, 50))
+        self.SetDefaultValues(100, 10, 1, 20, 20)
         self.simulation.changeMode('Momentum2')
 
     def OnPlanet(self,event):
-        self.simulation = Simulation(self)
-        # self.SetLabels(self.var_start, 'Mass1(kg)', 'Mass2(kg)', 'Mass3(kg)', 'Height(m)', 'Distance(m)')
-        # self.SetLabels(self.var_exec, 'hits')
-        # self.SetRanges((1, 5), (1, 10 ** 7), (1, 10 ** 7), (1, 10 ** 7), (1, 50), (1, 50))
+        self.SetLabels(self.var_start, 'Velocity', '% of Distance', '% of G', '% of M')
+        self.SetLabels(self.var_exec, 'days', 'V(m/s)')
+        self.SetRanges((10000, 80000), (80, 120), (80, 120), (80, 120))
+        self.SetDefaultValues(40000, 100, 100,100)
         self.simulation.changeMode('Planet')
 
-    def SetLabels(self,txt_list,*texts):
+    def SetLabels(self, txt_list, *texts):
         i = 0
         for txt in texts:
             txt_list[i].SetLabel(txt)
@@ -292,12 +254,18 @@ class MainWindow(window):
 
     def SetRanges(self,*ranges):
         i = 0
-        for min,max in ranges:
-            self.Ctrls[i].SetRange(min,max)
+        for low, high in ranges:
+            self.Ctrls[i].SetRange(low, high)
             self.Ctrls[i].Show()
             i += 1
         while i < 5:
             self.Ctrls[i].Hide()
+            i += 1
+
+    def SetDefaultValues(self, *values):
+        i = 0
+        for value in values:
+            self.Ctrls[i].SetValue(value)
             i += 1
 
 

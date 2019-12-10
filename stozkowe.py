@@ -7,9 +7,8 @@ class Conical:
 
     @staticmethod
     def description():
-        text(text="This is conical pendulum\nYou can define angle,length and mass\nYou can "
-                  "see that the mass doesn't affect the period",
-             align='center', depth=-0.2, color=color.green)
+        return "This is conical pendulum\nYou can define angle,length and mass\nYou can "\
+               "see that the mass doesn't affect the period"
 
     def prepare(self):
         self.angle = self.win.Ctrls[0].GetValue()
@@ -23,14 +22,19 @@ class Conical:
         self.Ball = sphere(pos=(self.r,0,0),radius=self.r/10,color=color.red)
         self.T=2*pi*sqrt((self.length*cos(self.theta)/g))
         self.t=0
-        self.dt=0.02
+        self.dt=0.002
 
     def run(self):
+        counter = 0
         while True:
             if not self.win.simulation_stopped:
-                rate(100)
+                rate(1000)
                 self.Thread.pos[0]=(cos((self.t/self.T)*2*pi)*self.r,0,sin((self.t/self.T)*2*pi)*self.r)
                 self.Ball.pos=(cos((self.t/self.T)*2*pi)*self.r,0,sin((self.t/self.T)*2*pi)*self.r)
-                self.t=self.t+self.dt
+                if counter%50 is 0:
+                    self.win.var_exec[0].SetLabel('x = ' + '%.2f' % self.Ball.pos.x)
+                    self.win.var_exec[1].SetLabel('z = ' + '%.2f' % self.Ball.pos.z)
+                self.t = self.t + self.dt
+                counter += 1
             else:
                 rate(10)
