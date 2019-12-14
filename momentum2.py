@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from visual import *
 from variables import *
 
@@ -8,10 +9,16 @@ class Momentum2:
         self.win = window
 
     @staticmethod
-    def description():
-        return "There is one ball and up to 5 balls on its path\nYou can define velocity of the first ball\n"\
-               "as well as its mass and mass of the remaining balls\nVelocity of all balls is displayed\n"\
-               "as well as height of the third ball"
+    def descriptionENG():
+        return "There are three balls\n You can define their masses as well as the distance between them\n" \
+               "They fall beacause of the gravity force and bounce\n This causes the lighttest ball to gain" \
+               "height"
+
+    @staticmethod
+    def descriptionPL():
+        return u"Są trzy piłki\nMożesz wybrać ich masy, a także odległość pomiędzy nimi\n" \
+               u"Spadają one pod wpływem grawitacji i odbijają się\nco powoduje nabranie bardzo dużej" \
+               u"wysokości przez najlżejszą kulkę"
 
     def prepare(self):
         self.mass1 = self.win.Ctrls[0].GetValue()
@@ -77,10 +84,13 @@ class Momentum2:
                 t = t + dt
                 counter = counter +1
                 if counter % 50 == 0:
-                    self.win.var_exec[0].SetLabel('V1(m/s): ' + '%.2f' % self.balls[0].v.y)
-                    self.win.var_exec[1].SetLabel('V2(m/s): ' + '%.2f' % self.balls[1].v.y)
-                    self.win.var_exec[2].SetLabel('V3(m/s): ' + '%.2f' % self.balls[2].v.y)
-                    self.win.var_exec[3].SetLabel('h(m): ' + '%.2f' % self.balls[2].pos.y)
+                    if self.win.PL:
+                        self.win.var_exec[3].SetLabel(u'wysokość = ' + '%.2f' % self.balls[2].pos.y + ' [m]')
+                    else:
+                        self.win.var_exec[3].SetLabel('h = ' + '%.2f' % self.balls[2].pos.y + ' [m]')
+                    self.win.var_exec[0].SetLabel('V1 = ' + '%.2f' % self.balls[0].v.y + '[m/s]')
+                    self.win.var_exec[1].SetLabel('V2 = ' + '%.2f' % self.balls[1].v.y + '[m/s]')
+                    self.win.var_exec[2].SetLabel('V3 = ' + '%.2f' % self.balls[2].v.y + '[m/s]')
             else:
                 while True:
                     rate(10)

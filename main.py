@@ -1,55 +1,39 @@
-import wx  # wx.Frame etc
-import os  # To get path for "Open file"
+# -*- coding: utf-8 -*-
+import wx
+import os
 from Simulation import *
 from visual import *
 import numpy as np
 
+
+
 class MainWindow(window):
-    """
-    This class is baseclass for MainWindow. MainWindow panels
-    are implemented in their own classes. MainWindow implements
-    filemenu and its functionality and sizers for different
-    """
-    # ID LIST FOR BUTTONS
-    ID_RUN_BUTTON = wx.NewId()
-    ID_PAUSE_BUTTON = wx.NewId()
-    ID_TOOLBAR = wx.NewId()
+
     screen_size = wx.GetDisplaySize()
 
-    # Simulation
     simulation = None
-    simulation_speed = 0
-    simulation_timestep = 0
     same_sim = False
     mode = ''
-    frequency = 0
 
-    # Flags
-    toolbarheight = 10
-    state_saved = False
     scene = None
     simulation_started = False
     simulation_stopped = False
-    debug_mode = False
 
-    # Datapanel
-    statusbar = None
-    button_list = None
-
-    following = None
-
+    legend = []
     var_start = []
     var_exec = []
     Ctrls = []
     variant = ''
+    PL = False
 
-    def __init__(self, title, debug=False):
+    def __init__(self):
         window.__init__(self, title="Dynamics", _make_panel=True, width = self.screen_size[0],
-                        height = self.screen_size[1] ) # kw _make_panel=False
+                        height=self.screen_size[1])
 
         self.fullscreen = True
         self.SetVariablesPanel()
         self.SetMenubar()
+        self.SetStart()
 
     def SetMenubar(self):
         filemenu = wx.Menu()
@@ -58,77 +42,96 @@ class MainWindow(window):
                                    "Terminate the program")
         self.win.Bind(wx.EVT_MENU, self.OnExit, menuItem)
 
-        planeButton = wx.Button(self.panel, label='Inclined Plane', pos=(10, 40))
+        self.planeButton = wx.Button(self.panel, label='Inclined Plane', pos=(0.01 * self.screen_size[0], 0.1 * self.screen_size[1]))
 
-        planeButton.Bind(wx.EVT_BUTTON, self.OnPlane)
+        self.planeButton.Bind(wx.EVT_BUTTON, self.OnPlane)
 
-        pendulumButton = wx.Button(self.panel, label='Pendulum', pos=(10, 80))
+        self.pendulumButton = wx.Button(self.panel, label='Pendulum', pos=(0.01 * self.screen_size[0], 0.14 * self.screen_size[1]))
 
-        pendulumButton.Bind(wx.EVT_BUTTON, self.OnPendulum)
+        self.pendulumButton.Bind(wx.EVT_BUTTON, self.OnPendulum)
 
-        throwButton = wx.Button(self.panel, label='Throw', pos=(10, 120))
+        self.throwButton = wx.Button(self.panel, label='Throw', pos=(0.01 * self.screen_size[0], 0.18 * self.screen_size[1]))
 
-        throwButton.Bind(wx.EVT_BUTTON, self.OnThrow)
+        self.throwButton.Bind(wx.EVT_BUTTON, self.OnThrow)
 
-        blockButton = wx.Button(self.panel, label='Block', pos=(10, 160))
+        self.blockButton = wx.Button(self.panel, label='Block', pos=(0.01 * self.screen_size[0], 0.22 * self.screen_size[1]))
 
-        blockButton.Bind(wx.EVT_BUTTON, self.OnBlock)
+        self.blockButton.Bind(wx.EVT_BUTTON, self.OnBlock)
 
-        helixButton = wx.Button(self.panel, label='Helix', pos=(10, 200))
+        self.helixButton = wx.Button(self.panel, label='Helix', pos=(0.01 * self.screen_size[0], 0.26 * self.screen_size[1]))
 
-        helixButton.Bind(wx.EVT_BUTTON, self.OnHelix)
+        self.helixButton.Bind(wx.EVT_BUTTON, self.OnHelix)
 
-        solarButton = wx.Button(self.panel, label='Solar System', pos=(10, 240))
+        self.solarButton = wx.Button(self.panel, label='Solar System', pos=(0.01 * self.screen_size[0], 0.3 * self.screen_size[1]))
 
-        solarButton.Bind(wx.EVT_BUTTON, self.OnSolar)
+        self.solarButton.Bind(wx.EVT_BUTTON, self.OnSolar)
 
-        conicalButton = wx.Button(self.panel, label='Conical Pendulum', pos=(10, 280))
+        self.conicalButton = wx.Button(self.panel, label='Conical Pendulum', pos=(0.01 * self.screen_size[0], 0.34 * self.screen_size[1]))
 
-        conicalButton.Bind(wx.EVT_BUTTON, self.OnConical)
+        self.conicalButton.Bind(wx.EVT_BUTTON, self.OnConical)
 
-        momentumButton = wx.Button(self.panel, label='Momentum', pos=(10, 320))
+        self.momentumButton = wx.Button(self.panel, label='Momentum', pos=(0.01 * self.screen_size[0], 0.38 * self.screen_size[1]))
 
-        momentumButton.Bind(wx.EVT_BUTTON, self.OnMomentum)
+        self.momentumButton.Bind(wx.EVT_BUTTON, self.OnMomentum)
 
-        momentum2Button = wx.Button(self.panel, label='Momentum2', pos=(10, 360))
+        self.momentum2Button = wx.Button(self.panel, label='Momentum2', pos=(0.01 * self.screen_size[0], 0.42 * self.screen_size[1]))
 
-        momentum2Button.Bind(wx.EVT_BUTTON, self.OnMomentum2)
+        self.momentum2Button.Bind(wx.EVT_BUTTON, self.OnMomentum2)
 
-        planetButton = wx.Button(self.panel, label='Planet', pos=(10, 400))
+        self.planetButton = wx.Button(self.panel, label='Planet', pos=(0.01 * self.screen_size[0], 0.46 * self.screen_size[1]))
 
-        planetButton.Bind(wx.EVT_BUTTON, self.OnPlanet)
+        self.planetButton.Bind(wx.EVT_BUTTON, self.OnPlanet)
 
-        runButton = wx.Button(self.panel, label='RUN', pos=(10, 0))
+        self.runButton = wx.Button(self.panel, label='RUN', pos=(0.01 * self.screen_size[0], 0.06 * self.screen_size[1]))
 
-        runButton.Bind(wx.EVT_BUTTON, self.OnRun)
+        self.runButton.Bind(wx.EVT_BUTTON, self.OnRun)
 
-        pauseButton = wx.Button(self.panel, label='PAUSE', pos=(120, 0))
+        self.pauseButton = wx.Button(self.panel, label='PAUSE', pos=(0.07 * self.screen_size[0], 0.06 * self.screen_size[1]))
 
-        pauseButton.Bind(wx.EVT_BUTTON, self.OnPause)
+        self.pauseButton.Bind(wx.EVT_BUTTON, self.OnPause)
 
-        resumeButton = wx.Button(self.panel, label='RESUME', pos=(210, 0))
+        self.resumeButton = wx.Button(self.panel, label='RESUME', pos=(0.13 * self.screen_size[0], 0.06 * self.screen_size[1]))
 
-        resumeButton.Bind(wx.EVT_BUTTON, self.OnResume)
+        self.resumeButton.Bind(wx.EVT_BUTTON, self.OnResume)
+
+        self.englishButton = wx.Button(self.panel, label='ENGLISH',
+                                 pos=(0.07 * self.screen_size[0], 0.02 * self.screen_size[1]))
+
+        self.englishButton.Bind(wx.EVT_BUTTON, self.OnEnglish)
+
+        self.polishButton = wx.Button(self.panel, label='POLISH',
+                                  pos=(0.13 * self.screen_size[0], 0.02 * self.screen_size[1]))
+
+        self.polishButton.Bind(wx.EVT_BUTTON, self.OnPolish)
 
         menuBar = wx.MenuBar()
 
         menuBar.Append(filemenu, "&File")
 
         self.win.SetMenuBar(menuBar)
-        if self.debug_mode:
-            print("...done!")
 
 
     def SetVariablesPanel(self):
         self.simulation = Simulation(self)
+        font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+        y = 0.06 * self.screen_size[1]
         for i in range(5):
-            self.var_start.append(wx.StaticText(self.panel, label='', pos=(0.08*self.screen_size[0], 0.04*(i+1)*self.screen_size[1])))
+            self.var_start.append(wx.StaticText(self.panel, label='', pos=(0.09*self.screen_size[0], y + 0.04*(i+1)*self.screen_size[1])))
             self.var_start[i].Hide()
-            self.Ctrls.append(wx.SpinCtrlDouble(self.panel, value='0', pos=(0.14*self.screen_size[0], 0.04*(i+1)*self.screen_size[1]), size=(60, -1)))
+            self.Ctrls.append(wx.SpinCtrlDouble(self.panel, value='0', pos=(0.15*self.screen_size[0], y + 0.04*(i+1)*self.screen_size[1]), size=(60, -1)))
             self.Ctrls[i].Hide()
             self.var_exec.append(wx.StaticText(self.panel, label='', pos=((0.9-i*0.1)*self.screen_size[0], 0.86*self.screen_size[1])))
             self.var_exec[i].Hide()
-        self.description = wx.StaticText(self.panel, label='Pick one simulation from the list', pos=(0.4*self.screen_size[0], 0.1*self.screen_size[1]))
+            self.var_exec[i].SetFont(font)
+            self.legend.append(wx.StaticText(self.panel, label='', pos=(0.01*self.screen_size[0],0.6*self.screen_size[1] + 0.04*(i+1)*self.screen_size[1])))
+        self.language = wx.StaticText(self.panel, label='Language', pos=(0.01*self.screen_size[0], 0.02 * self.screen_size[1]))
+        self.language.SetFont(font)
+
+    def SetStart(self):
+        txt = 'Welcome to dynamics simulation!\nPick one of the options on the left\n' \
+                'to read the description and pick parameters'
+        self.description = wx.StaticText(self.panel, label=txt,
+                                         pos=(0.4 * self.screen_size[0], 0.1 * self.screen_size[1]))
         font = wx.Font(18, wx.DECORATIVE, wx.ITALIC, wx.NORMAL)
         self.description.SetFont(font)
 
@@ -169,48 +172,84 @@ class MainWindow(window):
 
 
     def OnPlane(self,event):
-        symbol = 'Angle(' + u"\u00b0" + ')'
-        self.SetLabels(self.var_start, symbol ,'Mass(kg)', 'Length(m)', 'Friction', 'Air Resistance')
-        self.SetLabels(self.var_exec, 'time(s)', 'V(m/s)', 'a(m/s^2)', '')
+        if self.PL:
+            symbol = u'Kąt[' + u"\u00b0" + ']'
+            self.SetLabels(self.var_start, symbol, 'Masa[kg]', u'Długość[m]', 'Tarcie', u'Opór powietrza')
+            self.SetLabels(self.var_exec, 'czas', 'V', 'a')
+            self.SetLegend((u'-> Siła nacisku', 'red'), ('-> Fy', 'gray'), ('-> Fx', 'orange'), ('-> tarcie', 'magenta'),
+                           (u'-> opór powietrza', 'cyan'))
+        else:
+            symbol = 'Angle[' + u"\u00b0" + ']'
+            self.SetLabels(self.var_start, symbol, 'Mass[kg]', 'Length[m]', 'Friction', 'Air Resistance')
+            self.SetLabels(self.var_exec, 'time', 'V', 'a')
+            self.SetLegend(('-> N', 'red'), ('-> Fy', 'gray'), ('-> Fx', 'orange'), ('-> f', 'magenta'),
+                           ('-> air', 'cyan'))
         self.SetRanges((10, 80), (1, 100), (1, 100), (0, 1), (0, 1))
         self.SetDefaultValues(45, 10, 10, 0, 0)
         self.simulation.changeMode('Plane')
 
     def OnPendulum(self,event):
-        symbol = 'Angle(' + u"\u00b0" + ')'
-        self.SetLabels(self.var_start, symbol, 'Length(m)', 'g(m/s^2)')
-        self.SetLabels(self.var_exec, 'angle2', 'angle1', '', '')
-        self.SetRanges((10, 350), (1, 6), (0, 20))
-        self.SetDefaultValues(45, 4, g)
+        if self.PL:
+            symbol = u'Kąt[' + u"\u00b0" + ']'
+            self.SetLabels(self.var_start, symbol, u'Długość[m]', 'g[m/s^2]', u'Opór powietrza')
+            self.SetLabels(self.var_exec, u'kąt1', u'kąt2')
+        else:
+            symbol = 'Angle[' + u"\u00b0" + ']'
+            self.SetLabels(self.var_start, symbol, 'Length[m]', 'g[m/s^2]', 'Air Resistance')
+            self.SetLabels(self.var_exec, 'angle2', 'angle1')
+        self.SetRanges((0, 180), (0, 1), (0, 20), (0, 1))
+        self.SetDefaultValues(45, 1, g, 0)
+        self.SetLegend()
         self.simulation.changeMode('Pendulum')
 
     def OnThrow(self,event):
-        symbol = 'Angle(' + u"\u00b0" +')'
-        self.SetLabels(self.var_start, symbol, 'Velocity(m/s)', 'Air Resistance')
-        self.SetLabels(self.var_exec, 'x(m)', 'h(m)', 'Vy(m/s)', 'Vx(m/s)')
-        self.SetRanges((10, 80), (10, 300), (0, 5))
-        self.SetDefaultValues(45, 50, 0)
+        if self.PL:
+            symbol = u'Kąt[' + u"\u00b0" + ']'
+            self.SetLabels(self.var_start, symbol, u'Prędkość[m/s]', u'Opór Powietrza', u'Potęga')
+            self.SetLabels(self.var_exec, u'odległość', u'wysokość', 'Vy', 'Vx')
+        else:
+            symbol = 'Angle[' + u"\u00b0" +']'
+            self.SetLabels(self.var_start, symbol, 'Velocity[m/s]', 'Air Resistance', 'Power')
+            self.SetLabels(self.var_exec, 'distance', 'height', 'Vy', 'Vx')
+        self.SetRanges((1, 89), (1, 100), (0, 5), (0, 5))
+        self.SetLegend(('-> Vx', 'red'), ('-> Vy', 'magenta'))
+        self.SetDefaultValues(45, 50, 0, 0)
         self.simulation.changeMode('Throw')
 
     def OnBlock(self,event):
-        self.SetLabels(self.var_start, 'V(m/s)', 'Mass(kg)',)
-        self.SetLabels(self.var_exec, 'hits')
+        if self.PL:
+            self.SetLabels(self.var_start, u'Prędkość[m/s]', 'Masa[kg]', )
+            self.SetLabels(self.var_exec, u'uderzenia')
+        else:
+            self.SetLabels(self.var_start, 'V(m/s)', 'Mass(kg)',)
+            self.SetLabels(self.var_exec, 'hits')
         self.SetRanges((1, 5), (1, 10**12))
-        self.SetDefaultValues(1,100)
+        self.SetDefaultValues(1, 100)
+        self.SetLegend()
         self.simulation.changeMode('Block')
 
     def OnHelix(self,event):
-        self.SetLabels(self.var_start, 'k', 'Number', 'Mass(kg)')
-        self.SetLabels(self.var_exec, 'Ep + Ek', 'Ep', 'Ek')
+        if self.PL:
+            self.SetLabels(self.var_start, 'k', u'ilość', 'Masa[kg]')
+            self.SetLabels(self.var_exec, 'Ep + Ek', 'Ep', 'Ek')
+        else:
+            self.SetLabels(self.var_start, 'k', 'Number', 'Mass[kg]')
+            self.SetLabels(self.var_exec, 'Ep + Ek', 'Ep', 'Ek')
         self.SetRanges((0, 1), (1, 30), (0, 30))
         self.SetDefaultValues(1, 1, 10)
+        self.SetLegend()
         self.simulation.changeMode('Helixes')
 
     def OnSolar(self,event):
-        self.SetLabels(self.var_start, "% of Earth's V")
-        self.SetLabels(self.var_exec, 'Days')
+        if self.PL:
+            self.SetLabels(self.var_start, u"% prędkości Ziemi")
+            self.SetLabels(self.var_exec, 'Dni')
+        else:
+            self.SetLabels(self.var_start, "% of Earth's V")
+            self.SetLabels(self.var_exec, 'Days')
         self.SetRanges((0, 200))
         self.SetDefaultValues(100)
+        self.SetLegend()
         self.simulation.changeMode('Solar')
 
     def OnConical(self,event):
@@ -219,27 +258,43 @@ class MainWindow(window):
         self.SetLabels(self.var_exec, 'x(m)', 'z(m)')
         self.SetRanges((1, 89), (1, 100), (0, 20))
         self.SetDefaultValues(45, 1, 5)
+        self.SetLegend()
         self.simulation.changeMode('Conical')
 
     def OnMomentum(self,event):
-        self.SetLabels(self.var_start, 'V(m/s)', 'Mass1(kg)', 'Mass2(kg)', 'Number')
-        self.SetLabels(self.var_exec, 'V1(m/s)', 'V2(m/s)')
-        self.SetRanges((1, 5), (1, 1000), (1, 1000), (1, 5))
-        self.SetDefaultValues(2, 10, 1)
+        if self.PL:
+            self.SetLabels(self.var_start, u'Prędkość[m/s]', 'Masa1[kg]', 'Masa2[kg]', u'Ilość')
+            self.SetLabels(self.var_exec, 'V1', 'V2')
+        else:
+            self.SetLabels(self.var_start, 'Velocity[m/s]', 'Mass1[kg]', 'Mass2[kg]', 'Number')
+            self.SetLabels(self.var_exec, 'V1', 'V2')
+        self.SetRanges((0, 2), (1, 1000), (1, 1000), (1, 30))
+        self.SetDefaultValues(1, 1, 1, 10)
+        self.SetLegend()
         self.simulation.changeMode('Momentum')
 
     def OnMomentum2(self,event):
-        self.SetLabels(self.var_start, 'Mass1(kg)', 'Mass2(kg)', 'Mass3(kg)', 'Height(m)', 'Distance(m)')
-        self.SetLabels(self.var_exec, 'V1(m/s)', 'V2(m/s)', 'V3(m/s)', 'height(m)')
+        if self.PL:
+            self.SetLabels(self.var_start, 'Masa1[kg]', 'Masa2[kg]', 'Masa3[kg]', u'Wysokość[m]', u'Odległość[m]')
+            self.SetLabels(self.var_exec, 'V1', 'V2', 'V3', u'wysokość')
+        else:
+            self.SetLabels(self.var_start, 'Mass1[kg]', 'Mass2[kg]', 'Mass3[kg]', 'Height[m]', 'Distance[m]')
+            self.SetLabels(self.var_exec, 'V1', 'V2', 'V3', 'height')
         self.SetRanges((1, 10**7), (1, 10**7), (1, 10**7), (1, 50), (1, 50))
         self.SetDefaultValues(100, 10, 1, 20, 20)
+        self.SetLegend()
         self.simulation.changeMode('Momentum2')
 
     def OnPlanet(self,event):
-        self.SetLabels(self.var_start, 'Velocity', '% of Distance', '% of G', '% of M')
-        self.SetLabels(self.var_exec, 'days', 'V(m/s)')
+        if self.PL:
+            self.SetLabels(self.var_start, u'% Prędkości', u'% Odległości', u'% stałej G', u'% Masy Słońca')
+            self.SetLabels(self.var_exec, 'Dni', 'V')
+        else:
+            self.SetLabels(self.var_start, 'Velocity', '% of Distance', '% of G', '% of M')
+            self.SetLabels(self.var_exec, 'days', 'V')
         self.SetRanges((10000, 80000), (80, 120), (80, 120), (80, 120))
         self.SetDefaultValues(40000, 100, 100,100)
+        self.SetLegend()
         self.simulation.changeMode('Planet')
 
     def SetLabels(self, txt_list, *texts):
@@ -268,6 +323,75 @@ class MainWindow(window):
             self.Ctrls[i].SetValue(value)
             i += 1
 
+    def SetLegend(self, *values):
+        i = 0
+        for txt, hue in values:
+            self.legend[i].SetLabel(txt)
+            self.legend[i].SetForegroundColour(colors[hue])
+            font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.legend[i].SetFont(font)
+            self.legend[i].Show()
+            i += 1
+        while i < 5:
+            self.legend[i].SetLabel('')
+            i += 1
+
+    def OnEnglish(self, event):
+        if self.PL is True:
+            self.PL = False
+            self.SetLanguage()
+
+    def OnPolish(self, event):
+        if self.PL is False:
+            self.PL = True
+            self.SetLanguage()
+
+    def SetLanguage(self):
+        tmp = 'self.On' + self.simulation.mode + '(None)'
+        if self.PL:
+            self.description.SetLabel(u'Witaj w aplikacji do symulacji dynamiki!\nWybierz jedną z opcji dostępnych z '
+                                      u'lewej strony,\naby przeczytać opis i dostosować parametry')
+            self.planeButton.SetLabel(u'Równia Pochyła')
+            self.pendulumButton.SetLabel(u'Wahadło')
+            self.throwButton.SetLabel(u'Rzut Ukośny')
+            self.blockButton.SetLabel(u'Liczba PI')
+            self.helixButton.SetLabel(u'Drgania')
+            self.solarButton.SetLabel(u'Układ Słoneczny')
+            self.conicalButton.SetLabel(u'Wahadło Stożkowe')
+            self.momentumButton.SetLabel(u'Zasada zachowania pędu')
+            self.momentum2Button.SetLabel(u'Działo Galileusza')
+            self.planetButton.SetLabel(u'Merkury')
+            self.runButton.SetLabel(u'START')
+            self.pauseButton.SetLabel(u'PAUZA')
+            self.resumeButton.SetLabel(u'WZNÓW')
+            self.englishButton.SetLabel(u'ANGIELSKI')
+            self.polishButton.SetLabel(u'POLSKI')
+            self.language.SetLabel(u'Język')
+            self.simulation.description()
+        else:
+            self.description.SetLabel('Welcome to dynamics simulation!\nPick one of the options on the left\n'
+                'to read the description and pick parameters')
+            self.planeButton.SetLabel('Inclined Plane')
+            self.pendulumButton.SetLabel('Pendulum')
+            self.throwButton.SetLabel('Diagonal Throw')
+            self.blockButton.SetLabel('Block')
+            self.helixButton.SetLabel('Oscillations')
+            self.solarButton.SetLabel('Solar System')
+            self.conicalButton.SetLabel('Conical')
+            self.momentumButton.SetLabel('Momentum')
+            self.momentum2Button.SetLabel('Gallilei Cannon')
+            self.planetButton.SetLabel('Mercury')
+            self.runButton.SetLabel('RUN')
+            self.pauseButton.SetLabel('PAUSE')
+            self.resumeButton.SetLabel('RESUME')
+            self.englishButton.SetLabel('ENGLISH')
+            self.polishButton.SetLabel('POLISH')
+            self.language.SetLabel('Language')
+            self.simulation.description()
+        eval(tmp)
+
+
+
 
 if __name__ == '__main__':
-    w = MainWindow("Dynamics")
+    w = MainWindow()

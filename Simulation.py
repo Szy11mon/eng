@@ -19,13 +19,19 @@ class Simulation(object):
         for i in self.win.scene.objects:
             i.visible = False
 
+    def description(self):
+        if self.win.PL:
+            self.win.description.SetLabel(self.sim.descriptionPL())
+        else:
+            self.win.description.SetLabel(self.sim.descriptionENG())
+
     def changeMode(self,mode):
         if self.mode != mode:
             self.mode = mode
             code = self.mode + '(self.win)'
             self.sim = eval(code)
             self.win.simulation_stopped = True
-            self.win.description.SetLabel(self.sim.description())
+            self.description()
             self.win.description.Show()
             if self.win.scene:
                 self.win.scene.delete()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from visual import *
 from variables import *
 import wx
@@ -7,10 +8,16 @@ class Block:
     def __init__(self,window):
         self.win = window
 
-    def description(self):
+    def descriptionENG(self):
         return "There are two blocks\nFirst one has mass of 1kg\nYou can choose the mass of the second one"\
                "\nSecond block moves with defined velocity and hits first block\nThe number of hits below is"\
                "\nthe number of times the blocks hit each other or the wall"
+
+    def descriptionPL(self):
+        return u"Są dwa klocki\nPierwszy z nich ma masę 1kg\nMożesz wybrać masę i prędkość drugiego z nich\n" \
+               u"U dołu ekranu możesz śledzić ile razy klocki zderzyły się ze sobą\nlub pierwszy z nich" \
+               u"uderzył o ścianę\nNajciekawsze wyniki otrzymujemy dla masy drugiego klocka będącej wielokrotnością" \
+               u"100 kg"
 
     def prepare(self):
         self.win.scene.autoscale = False
@@ -28,21 +35,27 @@ class Block:
 
     def run(self):
         t = 0
-        dt = 0.005
+        dt = 0.00001
         counter=0
         self.win.var_exec[0].SetLabel('hits: 0')
         while True:
             if self.win.simulation_stopped == False:
-                rate(1000)
+                rate(1000000000)
                 if self.block1.pos.x < self.block2.pos.x + 1+(self.block1.size.x/2):
                     counter += 1
                     tmp = self.block1.v
                     self.block1.v = ((self.mass - 1)/(self.mass+1))*self.block1.v + (2/(self.mass+1))*self.block2.v
                     self.block2.v = (2*self.mass/(1+self.mass))*tmp + ((1-self.mass)/(1+self.mass))*self.block2.v
-                    self.win.var_exec[0].SetLabel('hits: ' + '%d' % counter)
+                    if self.win.PL:
+                        self.win.var_exec[0].SetLabel('uderzenia: ' + '%d' % counter)
+                    else:
+                        self.win.var_exec[0].SetLabel('hits: ' + '%d' % counter)
                 if self.block2.pos.x < -19:
                     counter += 1
-                    self.win.var_exec[0].SetLabel('hits: ' + '%d' % counter)
+                    if self.win.PL:
+                        self.win.var_exec[0].SetLabel('uderzenia: ' + '%d' % counter)
+                    else:
+                        self.win.var_exec[0].SetLabel('hits: ' + '%d' % counter)
                     self.block2.v = -self.block2.v
                 self.block1.pos=self.block1.pos + self.block1.v * dt
                 self.block2.pos=self.block2.pos + self.block2.v * dt

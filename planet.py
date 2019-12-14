@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from visual import *
 from variables import *
 
@@ -6,8 +7,14 @@ class Planet:
         self.win = window
 
     @staticmethod
-    def description():
-        return "This simulation shows a single planet\nYou can"
+    def descriptionENG():
+        return "This simulation shows a single planet\nYou can define its velocity\n" \
+               "as well as modify distance from the sun\nand change value of constants M and G"
+
+    @staticmethod
+    def descriptionPL():
+        return u"Symulacja ruchu Merkurego wokół słońca\n Możesz wybrać procent jego naturalnej prędkości,\n" \
+               u"a także modyfikować odległość od słońca, wartość stałej grawitacji oraz masę Słońca"
 
     def prepare(self):
         self.sun = sphere(pos=(0, 0, 0), radius=10 ** 10, color=color.yellow)
@@ -30,8 +37,11 @@ class Planet:
                 self.T.append(pos=self.planet.pos, retain=30000)
                 t += dt
                 if t % 86400 == 0:
-                    self.win.var_exec[0].SetLabel('Days: ' + '%d' % (t/86400))
-                    self.win.var_exec[1].SetLabel('V(km/s) = ' + '%.2f' % (self.planet.vel.mag/1000))
+                    if self.win.PL:
+                        self.win.var_exec[0].SetLabel('Dni: ' + '%d' % (t/86400))
+                    else:
+                        self.win.var_exec[0].SetLabel('Days: ' + '%d' % (t / 86400))
+                    self.win.var_exec[1].SetLabel('V = ' + '%.2f' % (self.planet.vel.mag / 1000) + ' [km/s]')
             else:
                 rate(10)
 

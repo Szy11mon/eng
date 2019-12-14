@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from visual import *
 
 class Helixes:
@@ -5,10 +6,15 @@ class Helixes:
     def __init__(self,window):
         self.win = window
 
-    def description(self):
+    def descriptionENG(self):
         return "There are two balls that don't move\nBalls are connected with helixes\nk is the elasticity factor"\
                "\nNumber means number of balls that move\nYou can also define mass of the balls\nDuring the simulation you will see"\
                "\nthe kinetic energy,potential energy and sum of the energy of all the balls "
+
+    def descriptionPL(self):
+        return u"Na krańcach są dwa słupki, które się nie poruszają\nŁączymy z nimi za pomocą sprężyn piłki, których liczbę można" \
+               u"zdefiniować\nMożesz także zmienić masę kulek oraz współczynnik sprężystości k\n Na początku wychylamy kulki\n" \
+               u"W trakcie symulacji widać Energie: potencjalną, kinetyczną i całkowitą"
 
     def prepare(self):
         self.k = self.win.Ctrls[0].GetValue()
@@ -43,26 +49,24 @@ class Helixes:
         self.dt=0.04
 
     def run(self):
-        counter = 0
         while true:
             if self.win.simulation_stopped == False:
                 Ek = 0
                 Ep = 0
                 rate(100)
                 for i in range(0,self.quantity-1):
-                    self.f[i]=self.k*(self.ba[i].pos+self.ba[i+2].pos)-2*self.ba[i+1].pos
+                    self.f[i] = self.k*(self.ba[i].pos+self.ba[i+2].pos)-2*self.ba[i+1].pos
                 for i in range(1,self.quantity):
-                    self.a=self.f[i-1]/self.mass
-                    self.ba[i].vel=self.ba[i].vel+self.a*self.dt
-                    self.ba[i].pos=self.ba[i].pos+self.ba[i].vel*self.dt
-                for i in range(0,self.quantity):
-                    self.he[i].pos=self.ba[i].pos
-                    self.he[i].axis=self.ba[i+1].pos-self.ba[i].pos
-                for i in range(1,self.quantity):
-                    Ek += (self.mass * self.ba[i].vel.y**2)/2
+                    self.a = self.f[i-1]/self.mass
+                    self.ba[i].vel = self.ba[i].vel+self.a*self.dt
+                    self.ba[i].pos = self.ba[i].pos+self.ba[i].vel*self.dt
+                for i in range(0, self.quantity):
+                    self.he[i].pos = self.ba[i].pos
+                    self.he[i].axis = self.ba[i+1].pos-self.ba[i].pos
+                for i in range(1, self.quantity):
+                    Ek += (self.mass * self.ba[i].vel.mag**2)/2
                     Ep += (self.k * self.ba[i].pos.y ** 2)/2
                 self.t = self.t + self.dt
-                counter = counter + 1
                 print 'Ek ' + str(Ek)
                 print 'Ep ' + str(Ep)
                 self.win.var_exec[0].SetLabel('Ep + Ek = ' + '%.2f'%(Ep + Ek))

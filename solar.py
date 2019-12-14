@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from visual import *
 from variables import *
 
@@ -7,9 +8,14 @@ class Solar:
         self.win = window
 
     @staticmethod
-    def description():
+    def descriptionENG():
         return "This simulation shows our solar system\nYou can pick with how much of its actual speed\n"\
                "the Earth will move\nThe number of days that passed is displayed"
+
+    @staticmethod
+    def descriptionPL():
+        return u"Symulacja naszego układu słonecznego\n Możesz wybrać procent prędkości Ziemi z jaką będzie" \
+               u"się poruszać\nU dołu ekranu możesz śledzić liczbę dni, które upłynęły"
 
     def prepare(self):
         self.percent = self.win.Ctrls[0].GetValue()
@@ -31,16 +37,19 @@ class Solar:
         t=0
         dt = 3600
         while self.win.simulation.mode == 'Solar':
-            if self.win.simulation_stopped == False:
-                rate(1000)
+            if not self.win.simulation_stopped:
+                rate(1000000)
                 for i in range(0, 4):
-                    a = vector(-G * M * (self.L[i].pos / (mag(self.L[i].pos) ** 3)))
+                    a = vector(-G * M * (self.L[i].pos / (mag(self.L[i].pos) ** 3.01)))
                     self.L[i].vel = self.L[i].vel + a * dt
                     self.L[i].pos = self.L[i].pos + self.L[i].vel * dt
-                    self.T[i].append(pos=self.L[i].pos,retain = 30000)
+                    self.T[i].append(pos=self.L[i].pos)
                 t += dt
                 if t % 86400 == 0:
-                    self.win.var_exec[0].SetLabel('Days: ' + '%d' % (t/86400))
+                    if self.win.PL:
+                        self.win.var_exec[0].SetLabel('Dni: ' + '%d' % (t/86400))
+                    else:
+                        self.win.var_exec[0].SetLabel('Days: ' + '%d' % (t / 86400))
             else:
                 rate(10)
 
