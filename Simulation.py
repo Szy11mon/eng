@@ -25,22 +25,33 @@ class Simulation(object):
         else:
             self.win.description.SetLabel(self.sim.descriptionENG())
 
-    def changeMode(self,mode):
+    def changeMode(self, mode):
         if self.mode != mode:
+            self.win.mode_changed = True
             self.mode = mode
+            if self.mode == 'Helixes':
+                for i in self.win.variants:
+                    i.Show()
+            else:
+                for i in self.win.variants:
+                    i.Hide()
             code = self.mode + '(self.win)'
             self.sim = eval(code)
             self.win.simulation_stopped = True
             self.description()
             self.win.description.Show()
-            if self.win.scene:
+            if not self.win.scene_destroyed:
                 self.win.scene.delete()
+                self.win.scene_destroyed = True
             self.win.same_sim = False
         else:
             pass
 
     def run(self):
+        self.win.mode_changed = False
         self.win.description.Hide()
+        for i in self.win.variants:
+            i.Hide()
         if not self.win.same_sim:
             self.win.SetDisplay()
             self.win.scene.background = color.black

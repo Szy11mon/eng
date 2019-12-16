@@ -35,12 +35,12 @@ class Block:
 
     def run(self):
         t = 0
-        dt = 0.00001
+        dt = 0.005
         counter=0
         self.win.var_exec[0].SetLabel('hits: 0')
         while True:
-            if self.win.simulation_stopped == False:
-                rate(1000000000)
+            if self.win.simulation_stopped is False:
+                rate(1000)
                 if self.block1.pos.x < self.block2.pos.x + 1+(self.block1.size.x/2):
                     counter += 1
                     tmp = self.block1.v

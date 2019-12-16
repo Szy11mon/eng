@@ -54,7 +54,7 @@ class Plane:
         self.cart.rotate(angle=self.theta, origin=vector(0, 0, 0), axis=vector(0, 0, 1))
         floor = box(pos=(0, -self.length*sin(self.theta)/2, 0), size=(self.length*cos(self.theta), 0.02*k, 0.2*k), color=color.green, opacity=0.3)
         wall = box(pos=(self.length*cos(self.theta)/2, 0, 0), size=(0.02*k, self.length*sin(self.theta), 0.2*k), color=color.green, opacity=0.3)
-        scalex = arrow(pos=(self.length*cos(self.theta)/2,  -self.length*sin(self.theta)/1.7, 0),axis=(-self.length*cos(self.theta), 0, 0),shaftwidth=0.01*self.length,color = color.white)
+        scalex = arrow(pos=(self.length*cos(self.theta)/2,  -self.length*sin(self.theta)/1.7, 0),axis=(-self.length*cos(self.theta), 0, 0),shaftwidth=0.01*self.length, color=color.white)
         scaley = arrow(pos=(self.length * cos(self.theta) / 1.7, -self.length*sin(self.theta)/2, 0), axis=(0, self.length*sin(self.theta), 0),
                        shaftwidth=0.01 * self.length, color=color.white)
         txtx = label(pos=(0,  -self.length*sin(self.theta)/1.5,0),text='x',box=False,height=25,border=0)
