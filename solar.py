@@ -7,19 +7,17 @@ class Solar:
     def __init__(self, window):
         self.win = window
 
-    @staticmethod
-    def descriptionENG():
-        return "This simulation shows our solar system\nYou can pick with how much of its actual speed\n"\
-               "the Earth will move\nThe number of days that passed is displayed\nThe acceleration of the planet" \
-               "is described by formula: a = GM/r^2\nYou can change the power in that formula\nDo it only by" \
-               " 0.01 or so, cause even then You will see shocking results"
-
-    @staticmethod
-    def descriptionPL():
-        return u"Symulacja naszego układu słonecznego\nMożesz wybrać procent prędkości Ziemi z jaką będzie" \
+    def description(self):
+        if self.win.PL:
+            return u"Symulacja naszego układu słonecznego\nMożesz wybrać procent prędkości Ziemi z jaką będzie" \
                u"się poruszać\nU dołu ekranu możesz śledzić liczbę dni, które upłynęły\nPrzyspieszenie planety" \
                u"opisane jest wzorem a = GM/r^2\nMożesz zmienić potęgę r w tym wzorze\nZmian lepiej dokonywać o setne " \
-               u"części,\n bo nawet wtedy można zaobserwować bardzo ciekawe zjawisko"
+               u"części,\nbo nawet wtedy można zaobserwować bardzo ciekawe zjawisko"
+        else:
+            return "This simulation shows our solar system\nYou can pick with how much of its actual speed\n" \
+                   "the Earth will move\nThe number of days that passed is displayed\nThe acceleration of the planet" \
+                   "is described by formula: a = GM/r^2\nYou can change the power in that formula\nDo it only by" \
+                   " 0.01 or so, cause even then You will see shocking results"
 
     def prepare(self):
         self.percent = self.win.Ctrls[0].GetValue()
@@ -45,7 +43,7 @@ class Solar:
             if not self.win.simulation_stopped:
                 rate(1000)
                 for i in range(0, 4):
-                    a = vector(-G * M * (self.L[i].pos / (mag(self.L[i].pos) ** (self.power + 1))))
+                    a = vector(-G * M * (self.L[i].pos / (mag(self.L[i].pos) ** self.power)))
                     self.L[i].vel = self.L[i].vel + a * dt
                     self.L[i].pos = self.L[i].pos + self.L[i].vel * dt
                     self.T[i].append(pos=self.L[i].pos)

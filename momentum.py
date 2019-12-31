@@ -9,16 +9,15 @@ class Momentum:
     def __init__(self, window):
         self.win = window
 
-    @staticmethod
-    def descriptionENG():
-        return "There is one ball and up to 5 balls on its path\nYou can define velocity of the first ball\n"\
-               "as well as its mass and mass of the remaining balls\nYou can see velocity of the first and second ball"
-
-    @staticmethod
-    def descriptionPL():
-        return u"Jest jedna piłka na której drodze stoją kolejne piłki, których liczbę możesz wybrać\n" \
-               u"Możesz także wybrać masę pierwszej kulki i wszystkich kolejnych\nU dołu ekranu możesz" \
-               u"śledzić prędkość pierwszej i drugiej piłki"
+    def description(self):
+        if self.win.PL:
+            return u"Jest jedna kulka na której drodze stoją kolejne kulki, których liczbę możesz wybrać\n" \
+               u"Możesz także wybrać masę pierwszej kulki i wszystkich kolejnych\nU dołu ekranu można" \
+               u"śledzić prędkość pierwszej i ostatnio uderzonej kulki"
+        else:
+            return "There is one ball and up to 5 balls on its path\nYou can define velocity of the first ball\n" \
+                   "as well as its mass and mass of the remaining balls\nYou can see velocity of the first and " \
+                   "the last hit ball"
 
     def prepare(self):
         self.V0 = self.win.Ctrls[0].GetValue()
@@ -49,6 +48,7 @@ class Momentum:
     def run(self):
         t = 0
         dt = 0.005
+        vel_to_show = 1
         counter = 0
         while True:
             if not self.win.simulation_stopped:
@@ -56,10 +56,11 @@ class Momentum:
                 for i in range(self.number):
                     if self.balls[i].pos.x > self.balls[i+1].pos.x - self.balls[i].radius -self.balls[i+1].radius:
                         momentum_conservation_principle(self.balls[i], self.balls[i+1])
+                        vel_to_show=i+1
                 for i in range(self.number+1):
                     self.balls[i].pos = self.balls[i].pos + self.balls[i].v * dt
                 if counter % 50 == 0:
-                    self.win.var_exec[0].SetLabel('V2 = ' + '%.2f' % self.balls[1].v.x + ' [m/s]')
+                    self.win.var_exec[0].SetLabel('V2 = ' + '%.2f' % self.balls[vel_to_show].v.x + ' [m/s]')
                     self.win.var_exec[1].SetLabel('V1 = ' + '%.2f' % self.balls[0].v.x + ' [m/s]')
                 t = t + dt
                 counter = counter + 1

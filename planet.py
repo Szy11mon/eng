@@ -7,15 +7,13 @@ class Planet:
     def __init__(self, window):
         self.win = window
 
-    @staticmethod
-    def descriptionENG():
-        return "This simulation shows a single planet\nYou can define its velocity\n" \
-               "as well as modify distance from the sun\nand change value of constants M and G"
-
-    @staticmethod
-    def descriptionPL():
-        return u"Symulacja ruchu Merkurego wokół słońca\n Możesz wybrać procent jego naturalnej prędkości,\n" \
+    def description(self):
+        if self.win.PL:
+            return u"Symulacja ruchu Merkurego wokół słońca\nMożna wybrać procent jego naturalnej prędkości,\n" \
                u"a także modyfikować odległość od słońca, wartość stałej grawitacji oraz masę Słońca"
+        else:
+            return "This simulation shows a single planet\nYou can define its velocity\n" \
+                   "as well as modify distance from the sun\nand change value of constants M and G"
 
     def prepare(self):
         self.sun = sphere(pos=(0, 0, 0), radius=10 ** 10, color=color.yellow)
@@ -27,9 +25,9 @@ class Planet:
         self.planet = sphere(pos=(self.dist_percent * 70 * (10 ** 9), 0, 0), radius=4.5 * 10 ** 9, color=color.magenta)
         self.win.scene.autoscale = False
         self.win.scene.range = 10 ** 11 * 4
-        self.planet.vel = vector(0, 40000, 0)
+        self.planet.vel = vector(0, self.vel_percent * 40000, 0)
         self.vel_vector = arrow(pos=self.planet.pos,
-                                axis=(-self.planet.vel.x * (9.3 ** 6), -self.planet.vel.y * (9.3 ** 6), 0),
+                                axis=(self.planet.vel.x * (9.3 ** 6), self.planet.vel.y * (9.3 ** 6), 0),
                                 shaftwidth=3000000000, opacity=1, color=color.green)
         self.F_vector = arrow(pos=self.planet.pos,
                               axis=(-self.planet.vel.y * (9.3 ** 6), self.planet.vel.x * (9.3 ** 6), 0),
@@ -47,10 +45,9 @@ class Planet:
                 self.planet.pos = self.planet.pos + self.planet.vel * dt
                 self.T.append(pos=self.planet.pos, retain=30000)
                 self.vel_vector.pos = self.planet.pos
-                self.vel_vector.axis = (-self.planet.vel.x * (9.3 ** 6), -self.planet.vel.y * (9.3 ** 6), 0)
+                self.vel_vector.axis = (self.planet.vel.x * (9.3 ** 6), self.planet.vel.y * (9.3 ** 6), 0)
                 self.F_vector.pos = self.planet.pos
                 self.F_vector.axis = (-self.planet.vel.y * (9.3 ** 6), self.planet.vel.x * (9.3 ** 6), 0)
-                print self.planet.vel
                 t += dt
                 if t % 86400 == 0:
                     if self.win.PL:
